@@ -1,7 +1,7 @@
 /*
  * Author: Andreas Linde <mail@andreaslinde.de>
  *
- * Copyright (c) 2012 HockeyApp, Bit Stadium GmbH.
+ * Copyright (c) 2012-2013 HockeyApp, Bit Stadium GmbH.
  * Copyright (c) 2011 Andreas Linde.
  * All rights reserved.
  *
@@ -40,12 +40,18 @@
 #import "BITUpdateManagerDelegate.h"
 #import "BITUpdateViewController.h"
 
+#import "BITFeedbackManager.h"
+#import "BITFeedbackActivity.h"
+#import "BITFeedbackComposeViewController.h"
+#import "BITFeedbackComposeViewControllerDelegate.h"
+#import "BITFeedbackListViewController.h"
+
 
 // Notification message which HockeyManager is listening to, to retry requesting updated from the server
 #define BITHockeyNetworkDidBecomeReachableNotification @"BITHockeyNetworkDidBecomeReachable"
 
 
-// hockey api error domain
+// hockey crash reporting api error domain
 typedef enum {
   BITCrashErrorUnknown,
   BITCrashAPIAppVersionRejected,
@@ -54,9 +60,7 @@ typedef enum {
 } BITCrashErrorReason;
 extern NSString *const __attribute__((unused)) kBITCrashErrorDomain;
 
-// Update App Versions
-
-// hockey api error domain
+// hockey update api error domain
 typedef enum {
   BITUpdateErrorUnknown,
   BITUpdateAPIServerReturnedInvalidStatus,
@@ -66,6 +70,27 @@ typedef enum {
   BITUpdateAPIClientCannotCreateConnection
 } BITUpdateErrorReason;
 extern NSString *const __attribute__((unused)) kBITUpdateErrorDomain;
+
+
+// hockey feedback api error domain
+typedef enum {
+  BITFeedbackErrorUnknown,
+  BITFeedbackAPIServerReturnedInvalidStatus,
+  BITFeedbackAPIServerReturnedInvalidData,
+  BITFeedbackAPIServerReturnedEmptyResponse,
+  BITFeedbackAPIClientAuthorizationMissingSecret,
+  BITFeedbackAPIClientCannotCreateConnection
+} BITFeedbackErrorReason;
+extern NSString *const __attribute__((unused)) kBITFeedbackErrorDomain;
+
+
+// HockeySDK
+
+typedef enum {
+  BITHockeyErrorUnknown,
+  HockeyAPIClientMissingJSONLibrary
+} BITHockeyErrorReason;
+extern NSString *const __attribute__((unused)) kBITHockeyErrorDomain;
 
 
 #endif
