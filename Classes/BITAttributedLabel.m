@@ -271,12 +271,15 @@ static inline NSAttributedString * NSAttributedStringBySettingColorFromContext(N
 - (CTFramesetterRef)framesetter {
     if (_needsFramesetter) {
         @synchronized(self) {
+#ifndef __clang_analyzer__
             if (_framesetter) CFRelease(_framesetter);
             if (_highlightFramesetter) CFRelease(_highlightFramesetter);
             
             self.framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)self.renderedAttributedText);
-            self.highlightFramesetter = nil;
+            
+            _highlightFramesetter = nil;
             _needsFramesetter = NO;
+#endif
         }
     }
     
@@ -669,6 +672,7 @@ static inline NSAttributedString * NSAttributedStringBySettingColorFromContext(N
                 CGFloat y = roundf(runBounds.origin.y + runBounds.size.height / 2.0f);
                 CGContextMoveToPoint(c, runBounds.origin.x, y);
                 CGContextAddLineToPoint(c, runBounds.origin.x + runBounds.size.width, y);
+                CFRelease(font);
                 
                 CGContextStrokePath(c);
             }
@@ -690,7 +694,7 @@ static inline NSAttributedString * NSAttributedStringBySettingColorFromContext(N
 
     self.links = [NSArray array];
     if (self.dataDetectorTypes != UIDataDetectorTypeNone) {
-        for (NSTextCheckingResult *result in [self detectedLinksInString:[self.attributedText string] range:NSMakeRange(0, [text length]) error:nil]) {
+        for (NSTextCheckingResult *result in [self detectedLinksInString:[self.attributedText string] range:NSMakeRange(0, [(NSString *)text length]) error:nil]) {
             [self addLinkWithTextCheckingResult:result];
         }
     }
@@ -823,7 +827,9 @@ static inline NSAttributedString * NSAttributedStringBySettingColorFromContext(N
         [highlightAttributedString addAttribute:(NSString *)kCTForegroundColorAttributeName value:(id)[self.highlightedTextColor CGColor] range:NSMakeRange(0, highlightAttributedString.length)];
         
         if (!self.highlightFramesetter) {
+#ifndef __clang_analyzer__
             self.highlightFramesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)highlightAttributedString);
+#endif
         }
         
         [self drawFramesetter:self.highlightFramesetter attributedString:highlightAttributedString textRange:textRange inRect:textRect context:c];
